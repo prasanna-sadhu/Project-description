@@ -1,3 +1,9 @@
+/**
+ * Loader Component
+ 
+ * @param {Object} props - Component props (currently none)
+
+ */
 function Loader()
 {
     return(
