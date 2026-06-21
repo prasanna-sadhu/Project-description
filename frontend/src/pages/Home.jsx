@@ -2,11 +2,16 @@ import  Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Card from "../components/Card";
 import Footer from "../components/Footer";
-function Home()
+function Home({
+    darkMode,setDarkMode
+})
 {
     return(
         <div className="page-container">
-            <Navbar/>
+            <Navbar
+            darkMode={darkMode}
+
+setDarkMode={setDarkMode}/>
             <main className="main-content">
                 <Hero/>
                 <div className="cards-container">
