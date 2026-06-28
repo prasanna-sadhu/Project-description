@@ -1,50 +1,105 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-
 import Footer from "../components/Footer";
+import { Input, Button } from "../components/ui";
+import axios from "axios";
 
-function About({
 
-darkMode,
+function About({ darkMode, setDarkMode }) {
+  const [products, setProducts] = useState([]);
 
-setDarkMode
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/products");
+        setProducts(res.data.products);
+      } catch (error) {
+        console.log("Unable to fetch products");
+      }
+    };
 
-})
+    fetchProducts();
+  }, []);
 
-{
+  return (
+    <div className="page-container">
 
-return(
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
-<div className="page-container">
-<Navbar
+      <main className="main-content">
 
-darkMode={darkMode}
+        <div className="about-section">
+          <h1>About Project</h1>
+          <p>
+            AI Product Description Generator helps users create professional
+            product descriptions for food products quickly and easily.
+          </p>
+        </div>
 
-setDarkMode={setDarkMode}
+        <div className="preview-box">
 
-/>
+          <div className="preview-header">
 
-<main className="main-content">
+            <h2>Product Preview</h2>
 
-<div className="about-section">
+            <div className="preview-actions">
 
-<h1>About the project</h1>
+              <Input
+                type="text"
+                placeholder="Search Product"
+              />
 
-<p>
+              <Button>
+                Add Product
+              </Button>
 
-AI Product Description Generator is a web application designed to help food processing businesses create professional product descriptions for e-commerce platforms.
+            </div>
 
-</p>
+          </div>
 
-</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Tone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-</main>
+            <tbody>
+              {products.length > 0 ? (
+                products
+                  .slice(-3)
+                  .reverse()
+                  .map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.name}</td>
+                      <td>{item.category}</td>
+                      <td>{item.tone}</td>
+                      <td>
+                        <span className="edit">Edit</span>
+                        {" | "}
+                        <span className="delete">Delete</span>
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4">No Products Available</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
-<Footer/>
+        </div>
 
-</div>
+      </main>
 
-);
+      <Footer />
 
+    </div>
+  );
 }
 
 export default About;
