@@ -1,25 +1,40 @@
-const express=require("express");
-const cors=require("cors");
+const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
-const app=express();
+
+const connectDB = require("./config/db");
+
+const productRoutes = require("./routes/products");
+const dashboardRoutes = require("./routes/dashboard");
+
+const app = express();
+
+connectDB();
+
 app.use(cors());
 app.use(express.json());
-const PORT=process.env.PORT||5000;
-const productRoutes=require("./routes/products");
-const dashboardRoutes = require("./routes/dashboard");
-app.use("/api/products",productRoutes);
+
+app.use("/api/products", productRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.get("/",(req,res)=>{
+
+app.get("/", (req, res) => {
     res.json({
-        message:"AI Product Description"
+        message: "AI Product Description Generator API"
     });
 });
-app.use((err,req,res,next)=>{
+
+app.use((err, req, res, next) => {
+
+    console.error(err.stack);
+
     res.status(500).json({
-        message:"server error"
+        message: "Server Error"
     });
+
 });
-app.listen(PORT,()=>
-{
-    console.log(`server running on port ${PORT}`);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(` Server running on port ${PORT}`);
 });

@@ -1,39 +1,67 @@
 const express = require("express");
 const router = express.Router();
 
-const { products } = require("./productsData");
+const Product = require("../models/Product");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
 
-    const totalDescriptions = products.length;
+    try {
 
-    const productsGenerated = products.length;
+        const products = await Product.find().sort({ createdAt: -1 });
 
-    const thisMonth = products.length;
+        const totalDescriptions = products.length;
 
-    let wordsGenerated = 0;
+        const productsGenerated = products.length;
 
-    products.forEach(product => {
-        wordsGenerated += product.keywords.split(" ").length;
-    });
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
 
-    res.json({
+        const thisMonth = products.filter(product => {
 
-        stats: {
+            const date = new Date(product.createdAt);
 
-            totalDescriptions,
+            return (
+                date.getMonth() === currentMonth &&
+                date.getFullYear() === currentYear
+            );
 
-            productsGenerated,
+        }).length;
 
-            thisMonth,
+        let wordsGenerated = 0;
 
-            wordsGenerated
+        products.forEach(product => {
 
-        },
+            wordsGenerated += product.keywords.split(" ").length;
 
-        recent: products
+        });
 
-    });
+        res.status(200).json({
+
+            stats: {
+
+                totalDescriptions,
+
+                productsGenerated,
+
+                thisMonth,
+
+                wordsGenerated
+
+            },
+
+            recent: products
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+
+            message: error.message
+
+        });
+
+    }
 
 });
 

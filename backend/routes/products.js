@@ -1,114 +1,233 @@
-const express=require("express");
-const router=express.Router();
-const { products } = require("./productsData");
-router.get("/",(req,res)=>{
-    res.status(200).json({
-        message:"All products are fetched successfully",
-        products});
-});
-router.post("/generate",(req,res)=>{
-    const{name,category,keywords,tone}=req.body;
-    if(!name ||!category ||!keywords ||!tone)
-    {
-        return res.status(400).json({
-            message:"All fields are required"
+const express = require("express");
+const router = express.Router();
+
+const Product = require("../models/Product");
+
+router.get("/", async (req, res) => {
+
+    try {
+
+        const products = await Product.find();
+
+        res.status(200).json({
+            message: "All products fetched successfully",
+            products
         });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
     }
-    const description=`${name} is a ${tone.toLowerCase()} ${category.toLowerCase()} product prepared using ${keywords}.`;
+
+});
+
+router.post("/generate", async (req, res) => {
+
+    const { name, category, keywords, tone } = req.body;
+
+    if (!name || !category || !keywords || !tone) {
+
+        return res.status(400).json({
+            message: "All fields are required"
+        });
+
+    }
+
+    const description = `${name} is a ${tone.toLowerCase()} ${category.toLowerCase()} product prepared using ${keywords}.`;
+
     res.status(200).json({
-        message:"Product Description generated successfully",
+        message: "Product Description Generated Successfully",
         description
     });
+
 });
-router.get("/:id",(req,res)=>{
-    const id=parseInt(req.params.id);
-    const product=products.find(p=>p.id==id);
-    if(!product)
-    {
-        return res.status(404).json({
-            message:"product not found"
+
+router.get("/:id", async (req, res) => {
+
+    try {
+
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+
+            return res.status(404).json({
+                message: "Product Not Found"
+            });
+
+        }
+
+        res.status(200).json({
+            message: "Product fetched successfully",
+            product
         });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
     }
-    res.status(200).json({message:"product fetched successfully",product});
+
 });
-router.post("/",(req,res)=>
-{
-    const{name,category,keywords,tone}=req.body;
-    if(!name||!category||!keywords||!tone)
-    {
+
+router.post("/", async (req, res) => {
+
+    const { name, category, keywords, tone } = req.body;
+
+    if (!name || !category || !keywords || !tone) {
+
         return res.status(400).json({
-            message:"All fields ae required"
+            message: "All fields are required"
         });
+
     }
-    const newProduct={
-        id:products.length+1,
-        name,
-        category,
-        keywords,
-        tone
-    };
-    products.push(newProduct);
-    res.status(201).json({
-        message:"product Added Successfully",
-        product:newProduct
-    });
+
+    try {
+
+        const product = await Product.create({
+
+            name,
+            category,
+            keywords,
+            tone
+
+        });
+
+        res.status(201).json({
+
+            message: "Product Added Successfully",
+            product
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
 });
-router.get("/search", (req, res) => {
+
+router.get("/search/query", async (req, res) => {
+
     const q = req.query.q;
 
-    if (!q) {
-        return res.status(400).json({
-            message: "Search query"
+    try {
+
+        const products = await Product.find({
+
+            $or: [
+
+                { name: { $regex: q, $options: "i" } },
+
+                { category: { $regex: q, $options: "i" } },
+
+                { keywords: { $regex: q, $options: "i" } },
+
+                { tone: { $regex: q, $options: "i" } }
+
+            ]
+
         });
+
+        res.status(200).json({
+
+            message: "Search Completed Successfully",
+            count: products.length,
+            products
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
     }
 
-    const result = products.filter(p =>
-        p.name.toLowerCase().includes(q.toLowerCase()) ||
-        p.category.toLowerCase().includes(q.toLowerCase()) ||
-        p.keywords.toLowerCase().includes(q.toLowerCase()) ||
-        p.tone.toLowerCase().includes(q.toLowerCase())
-    );
-
-    res.status(200).json({
-        message:"search completed successfully",
-        count: result.length,
-        products: result
-    });
 });
-router.put("/:id",(req,res)=>{
-    const id=parseInt(req.params.id);
-    const product=products.find(p=>p.id==id);
-    if(!product)
-    {
-        return res.status(404).json({
-            message:"product not found"
+
+router.put("/:id", async (req, res) => {
+
+    try {
+
+        const product = await Product.findByIdAndUpdate(
+
+            req.params.id,
+
+            req.body,
+
+            { new: true }
+
+        );
+
+        if (!product) {
+
+            return res.status(404).json({
+
+                message: "Product Not Found"
+
+            });
+
+        }
+
+        res.status(200).json({
+
+            message: "Product Updated Successfully",
+
+            product
+
         });
-    }
-    product.name=req.body.name||product.name;
-    product.category=req.body.category|| product.category;
-    product.keywords=req.body.keywords||product.keywords;
-    product.tone=req.body.tone||product.tone;
-    res.status(200).json({
-        message:"Product Updated Successfully",
-        product
-    });
-});
 
-router.delete("/:id",(req,res)=>{
-    const id=parseInt(req.params.id);
-    const index=products.findIndex(p=>p.id==id);
-    if(index==-1)
-    {
-        return res.status(404).json({
-            message:"product not found"
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
         });
-    }
-    const deletedProduct = products[index];
-    products.splice(index,1);
-    res.status(200).json({
-        message:"product deleted successfully",deletedProduct
 
-    });
+    }
+
 });
 
-module.exports=router;
+router.delete("/:id", async (req, res) => {
+
+    try {
+
+        const product = await Product.findByIdAndDelete(req.params.id);
+
+        if (!product) {
+
+            return res.status(404).json({
+
+                message: "Product Not Found"
+
+            });
+
+        }
+
+        res.status(200).json({
+
+            message: "Product Deleted Successfully",
+
+            product
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+module.exports = router;
