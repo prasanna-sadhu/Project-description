@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Input, Button, Loader, Toast } from "../components/ui";
 
-function Generator() {
+function Generator({ darkMode, setDarkMode }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [keywords, setKeywords] = useState("");
@@ -11,105 +17,200 @@ function Generator() {
 
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const generateDescription = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setDescription("");
+  useEffect(() => {
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
 
-    setTimeout(() => {
-      setDescription(
-  ` ${productName} - Premium Quality Product
+  const fetchProduct = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/products/${id}`
+      );
 
-Experience the authentic taste and exceptional quality of ${productName}, carefully crafted to deliver the perfect balance of flavor, freshness, and tradition. This product belongs to the ${category} category and is designed for customers who value purity, taste, and premium standards.
+      const product = res.data.product || res.data;
 
-Made using handpicked ingredients, ${productName} ensures a rich and natural experience in every use. Enhanced with ${keywords}, it brings together traditional methods and modern quality control to guarantee consistency and satisfaction.
-
-Ideal for daily use, gifting, or special occasions, this product is known for its superior aroma, taste, and long-lasting freshness. The carefully selected ingredients ensure that every bite or use delivers a memorable experience.
-
-With a perfectly balanced ${tone} tone, this product stands out in its category for its authenticity and premium feel. Whether you are a home user or a professional, ${productName} is designed to meet high expectations with ease.
-
-Order today and experience why ${productName} is trusted by thousands of customers for its quality, consistency, and excellence.`
-);
-      setLoading(false);
-      setToastMessage("Description Generated!");
-      setShowToast(true);
-
-      setTimeout(() => setShowToast(false), 2000);
-    }, 1500);
+      setProductName(product.name);
+      setCategory(product.category);
+      setKeywords(product.keywords);
+      setTone(product.tone);
+      setDescription(product.description);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  return (
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      if (id) {
+        await axios.put(
+          `http://localhost:5000/api/products/${id}`,
+          {
+            name: productName,
+            category,
+            keywords,
+            tone,
+            description,
+          }
+        );
+
+        setToastMessage("Product Updated Successfully!");
+
+        setShowToast(true);
+
+        window.dispatchEvent(
+          new Event("dashboardUpdate")
+        );
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      } else {
+        const res = await axios.post(
+          "http://localhost:5000/api/products/generate",
+          {
+            name: productName,
+            category,
+            keywords,
+            tone,
+          }
+        );
+
+        setDescription(res.data.description);
+
+        setToastMessage("Generated Successfully!");
+
+        setShowToast(true);
+
+        window.dispatchEvent(
+          new Event("dashboardUpdate")
+        );
+      }
+
+      setLoading(false);
+
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+
+    } catch (error) {
+      console.log(error);
+
+      setLoading(false);
+
+      setToastMessage("Something went wrong");
+
+      setShowToast(true);
+
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+    }
+  };
+    return (
     <>
-      <Navbar />
+      <Navbar
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       <main className="main-content">
         <div className="generator-container">
 
           <div className="generator-form">
-            <h1>AI Product Description Generator</h1>
-            <p>Enter product details to generate a description.</p>
 
-            <form onSubmit={generateDescription} className="gen-form">
+            <h1>
+              {id
+                ? "Update Product"
+                : "AI Product Description Generator"}
+            </h1>
+
+            <p>
+              {id
+                ? "Modify the product details and click Update."
+                : "Enter product details to generate description."}
+            </p>
+
+            <form
+              className="gen-form"
+              onSubmit={handleSubmit}
+            >
 
               <Input
                 label="Product Name"
-                placeholder="Organic Mango Pickle"
                 value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                onChange={(e) =>
+                  setProductName(e.target.value)
+                }
+                placeholder="Organic Mango Pickle"
               />
 
               <Input
                 label="Category"
-                placeholder="Pickles"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) =>
+                  setCategory(e.target.value)
+                }
+                placeholder="Pickles"
               />
 
               <Input
                 label="Keywords"
-                placeholder="Fresh Mangoes, Homemade Spices"
                 value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
+                onChange={(e) =>
+                  setKeywords(e.target.value)
+                }
+                placeholder="Fresh Mango, Homemade Spices"
               />
 
               <Input
                 label="Tone"
-                placeholder="Healthy / Premium / Traditional"
                 value={tone}
-                onChange={(e) => setTone(e.target.value)}
+                onChange={(e) =>
+                  setTone(e.target.value)
+                }
+                placeholder="Premium / Traditional / Healthy"
               />
 
-              <Button type="submit">Generate Description</Button>
+              <Button type="submit">
+                {id
+                  ? "Update Product"
+                  : "Generate Description"}
+              </Button>
 
             </form>
+
           </div>
 
           <div className="generator-output">
 
-            <div className="output-header">
-              <h2>Generated Description</h2>
-            </div>
+            <h2>Generated Description</h2>
 
             {loading && <Loader />}
 
-            {showToast && <Toast message={toastMessage} />}
-
-            {!description && !loading && (
-              <div className="placeholder">
-                <div className="bar"></div>
-                <div className="bar"></div>
-                <div className="bar"></div>
-                <div className="bar"></div>
-              </div>
+            {!loading && !description && (
+              <p className="placeholder-text">
+                Your AI-generated description will appear here...
+              </p>
             )}
 
-            {description && (
+            {!loading && description && (
               <div className="output-box">
                 <p>{description}</p>
               </div>
+            )}
+
+            {showToast && (
+              <Toast message={toastMessage} />
             )}
 
           </div>

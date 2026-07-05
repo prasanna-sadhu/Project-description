@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
 
 function Dashboard({ darkMode, setDarkMode }) {
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState({
     totalDescriptions: 0,
     productsGenerated: 0,
@@ -12,12 +15,23 @@ function Dashboard({ darkMode, setDarkMode }) {
   });
 
   const [recentDescriptions, setRecentDescriptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard");
+      const res = await axios.get(
+        "http://localhost:5000/api/dashboard"
+      );
 
-      setStats(res.data.stats || {});
+      setStats(
+        res.data.stats || {
+          totalDescriptions: 0,
+          productsGenerated: 0,
+          thisMonth: 0,
+          wordsGenerated: 0,
+        }
+      );
+
       setRecentDescriptions(res.data.recent || []);
     } catch (error) {
       console.log("Dashboard API not available", error);
@@ -26,16 +40,42 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   useEffect(() => {
     fetchDashboard();
+
+    window.addEventListener("dashboardUpdate", fetchDashboard);
+
+    return () => {
+      window.removeEventListener(
+        "dashboardUpdate",
+        fetchDashboard
+      );
+    };
   }, []);
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(
+        `http://localhost:5000/api/products/${id}`
+      );
+
       fetchDashboard();
     } catch (error) {
       console.log("Delete Failed");
     }
   };
+
+  const editProduct = (product) => {
+    navigate(`/generator/${product._id}`);
+  };
+
+  const filteredProducts = recentDescriptions.filter((item) => {
+    const product = item.product || item;
+
+    return (
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.tone?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   return (
     <div className="page-container">
@@ -73,91 +113,113 @@ function Dashboard({ darkMode, setDarkMode }) {
 
           </div>
 
-          <div className="table-section">
+          <div className="preview-box">
 
-            <table>
+            <div className="preview-header">
 
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Tone</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+              <h2>Product Preview</h2>
 
-              <tbody>
+              <input
+                type="text"
+                className="search-box"
+                placeholder="Search Product..."
+                value={searchTerm}
+                onChange={(e) =>
+                  setSearchTerm(e.target.value)
+                }
+              />
 
-                {recentDescriptions.length > 0 ? (
+            </div>
 
-                  recentDescriptions.map((item, index) => {
+            <div className="table-container">
 
-                    const product = item.product || item;
+              <table>
 
-                    return (
-
-                      <tr key={product._id || index}>
-
-                        <td>{product.name}</td>
-
-                        <td>{product.category}</td>
-
-                        <td>{product.tone}</td>
-
-                        <td>
-
-                          <span
-                            className="edit"
-                            style={{
-                              cursor: "pointer",
-                              color: "#2563eb",
-                              fontWeight: "600",
-                            }}
-                            onClick={() =>
-                              alert("Edit functionality coming soon")
-                            }
-                          >
-                            Edit
-                          </span>
-
-                          {" | "}
-
-                          <span
-                            className="delete"
-                            style={{
-                              cursor: "pointer",
-                              color: "#dc2626",
-                              fontWeight: "600",
-                            }}
-                            onClick={() =>
-                              deleteProduct(product._id)
-                            }
-                          >
-                            Delete
-                          </span>
-
-                        </td>
-
-                      </tr>
-
-                    );
-                  })
-
-                ) : (
-
+                <thead>
                   <tr>
-
-                    <td colSpan="4">
-                      No Descriptions Generated Yet
-                    </td>
-
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Tone</th>
+                    <th>Action</th>
                   </tr>
+                </thead>
 
-                )}
+                <tbody>
 
-              </tbody>
+                  {filteredProducts.length > 0 ? (
 
-            </table>
+                    filteredProducts.map((item, index) => {
+
+                      const product = item.product || item;
+
+                      return (
+
+                        <tr key={product._id || index}>
+
+                          <td>{product.name}</td>
+
+                          <td>{product.category}</td>
+
+                          <td>{product.tone}</td>
+
+                          <td>
+
+                            <span
+                              className="edit"
+                              style={{
+                                color: "#2563eb",
+                                cursor: "pointer",
+                                fontWeight: "600",
+                                marginRight: "12px",
+                              }}
+                              onClick={() =>
+                                editProduct(product)
+                              }
+                            >
+                              Edit
+                            </span>
+
+                            |
+
+                            <span
+                              className="delete"
+                              style={{
+                                color: "#dc2626",
+                                cursor: "pointer",
+                                fontWeight: "600",
+                                marginLeft: "12px",
+                              }}
+                              onClick={() =>
+                                deleteProduct(product._id)
+                              }
+                            >
+                              Delete
+                            </span>
+
+                          </td>
+
+                        </tr>
+
+                      );
+                    })
+
+                  ) : (
+
+                    <tr>
+
+                      <td colSpan="4">
+                        No Matching Products Found
+                      </td>
+
+                    </tr>
+
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
 
           </div>
 

@@ -7,21 +7,18 @@ function Hero() {
   return (
     <section className="hero">
 
-      {/* Heading */}
       <h1>
         Create <span>Professional Food Product</span>
         <br />
         Descriptions with AI
       </h1>
 
-      {/* Subtitle */}
       <p>
         Generate engaging, SEO-friendly and high-converting product
         descriptions in seconds. Perfect for food brands, restaurants,
         grocery stores and e-commerce businesses.
       </p>
 
-      {/* Buttons */}
       <div className="hero-buttons">
         <Button onClick={() => navigate("/generator")}>
           Generate Description
@@ -35,7 +32,6 @@ function Hero() {
         </button>
       </div>
 
-      {/* Statistics */}
       <div className="hero-stats">
 
         <div className="stat-card">

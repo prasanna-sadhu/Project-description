@@ -1,103 +1,89 @@
-import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Input, Button } from "../components/ui";
-import axios from "axios";
-
 
 function About({ darkMode, setDarkMode }) {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/products");
-        setProducts(res.data.products);
-      } catch (error) {
-        console.log("Unable to fetch products");
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
   return (
     <div className="page-container">
-
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       <main className="main-content">
-
         <div className="about-section">
+
           <h1>About Project</h1>
-          <p>
-            AI Product Description Generator helps users create professional
-            product descriptions for food products quickly and easily.
+
+          <p className="about-intro">
+            AI Product Description Generator is a smart web application that
+            creates professional and engaging product descriptions within
+            seconds. It helps businesses and online sellers save time while
+            producing high-quality content.
           </p>
-        </div>
 
-        <div className="preview-box">
+          <div className="about-cards">
 
-          <div className="preview-header">
+            <div className="about-card">
+              <h2>Our Mission</h2>
+              <p>
+                To simplify product description writing using Artificial
+                Intelligence and help users create attractive content quickly.
+              </p>
+            </div>
 
-            <h2>Product Preview</h2>
+            <div className="about-card">
+              <h2>What It Does</h2>
+              <p>
+                Enter product details such as name, category, keywords and
+                preferred tone, then generate a unique and professional
+                description instantly.
+              </p>
+            </div>
 
-            <div className="preview-actions">
+            <div className="about-card">
+              <h2>Key Features</h2>
+              <ul>
+                <li>AI-generated descriptions</li>
+                <li>Multiple writing tones</li>
+                <li>Dashboard management</li>
+                <li>Edit and Delete products</li>
+                <li>Search functionality</li>
+                <li>Light & Dark Mode</li>
+              </ul>
+            </div>
 
-              <Input
-                type="text"
-                placeholder="Search Product"
-              />
+            <div className="about-card">
+              <h2>Benefits</h2>
+              <p>
+                Saves time, improves productivity, creates engaging product
+                content and reduces manual writing effort.
+              </p>
+            </div>
 
-              <Button>
-                Add Product
-              </Button>
+            <div className="about-card">
+              <h2>Why Choose This Project?</h2>
+              <p>
+                The application generates consistent, professional and
+                customer-friendly descriptions that help improve product
+                presentation and online sales.
+              </p>
+            </div>
 
+            <div className="about-card">
+              <h2>Target Users</h2>
+              <p>
+                Designed for online sellers, food businesses, startups,
+                digital marketers and anyone looking to generate product
+                descriptions quickly and efficiently.
+              </p>
             </div>
 
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Tone</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {products.length > 0 ? (
-                products
-                  .slice(-3)
-                  .reverse()
-                  .map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.name}</td>
-                      <td>{item.category}</td>
-                      <td>{item.tone}</td>
-                      <td>
-                        <span className="edit">Edit</span>
-                        {" | "}
-                        <span className="delete">Delete</span>
-                      </td>
-                    </tr>
-                  ))
-              ) : (
-                <tr>
-                  <td colSpan="4">No Products Available</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
         </div>
-
       </main>
 
       <Footer />
-
     </div>
   );
 }
