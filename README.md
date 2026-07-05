@@ -71,4 +71,62 @@ http://localhost:5000/api/products
 - POST `/api/products/generate`
 
 ---
+## Database
 
+This project uses **MongoDB** with **Mongoose**.
+
+### Why MongoDB?
+
+- Stores AI-generated product descriptions as flexible JSON documents.
+- Works well with Node.js and Express (MERN stack).
+- Easy to scale using MongoDB Atlas cloud database.
+- Supports fast CRUD operations and flexible schema design.
+
+---
+## Database Schema
+
+The schema represents the structure of the Product collection.
+
+![Schema Diagram](images/schemaDiagram.png)
+
+---
+
+## Set Up the Database
+
+### 1. Create MongoDB Database
+Use MongoDB Atlas or local MongoDB.
+
+### 2. Get Connection String
+Copy the MongoDB URI from Atlas.
+
+### 3. Create `.env` file
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://prasannasadhu:prasanna123@cluster0.iujwxtx.mongodb.net/Productdb?appName=Cluster0
+```
+
+### 4. Run Backend
+```bash
+npm run dev
+```
+
+---
+
+## Project Structure
+
+```
+AI-Product-Description/
+│
+├── frontend/
+│
+├── backend/
+│   ├── models/
+│   ├── routes/
+│   ├── server.js
+│   ├── .env.example
+│
+├── images/
+│   └── schema.png
+│
+└── README.md
+```
