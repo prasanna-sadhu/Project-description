@@ -102,7 +102,7 @@ Copy the MongoDB URI from Atlas.
 ### 3. Create `.env` file
 ```env
 PORT=5000
-MONGO_URI=mongodb+srv://prasannasadhu:prasanna123@cluster0.iujwxtx.mongodb.net/Productdb?appName=Cluster0
+MONGO_URI=MONGO_LINK
 ```
 
 ### 4. Run Backend
