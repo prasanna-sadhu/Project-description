@@ -87,7 +87,7 @@ This project uses **MongoDB** with **Mongoose**.
 
 The schema represents the structure of the Product collection.
 
-![Schema Diagram](images/schemaDiagram.png)
+![Schema Diagram](images/SchemaDiagram.png)
 
 ---
 
@@ -126,7 +126,7 @@ AI-Product-Description/
 │   ├── .env.example
 │
 ├── images/
-│   └── schema.png
+│   └── SchemaDiagram.png
 │
 └── README.md
 ```
