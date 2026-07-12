@@ -1,26 +1,129 @@
-import Navbar from "../components/Navbar";
+import { useState, useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-import {
+import { Input, Button } from "../components/ui";
 
-Input,
+import { AuthContext } from "../context/AuthContext";
 
-Button
 
-}
+function Login({ darkMode, setDarkMode }) {
 
-from "../components/ui";
 
-function Login({
+  const [loginMode, setLoginMode] = useState(true);
 
-darkMode,
 
-setDarkMode
+  const [email,setEmail] = useState("");
 
-})
+  const [password,setPassword] = useState("");
 
-{
+
+  const [message,setMessage] = useState("");
+
+
+  const { login } = useContext(AuthContext);
+
+
+  const navigate = useNavigate();
+
+  const submitHandler = async(e)=>{
+
+
+    e.preventDefault();
+
+
+    try{
+
+
+      if(loginMode){
+
+
+        const res = await axios.post(
+
+          "http://localhost:5000/api/auth/login",
+
+          {
+            email,
+            password
+          }
+
+        );
+
+        setMessage("Login Successful");
+
+
+        login(res.data.token);
+
+        setTimeout(()=>{
+
+          navigate("/dashboard");
+
+        },1000);
+
+
+
+      }
+
+      else{
+
+
+        const res = await axios.post(
+
+          "http://localhost:5000/api/auth/register",
+
+          {
+            email,
+            password
+          }
+
+        );
+
+        setMessage(
+          res.data.message
+        );
+
+
+        setTimeout(()=>{
+
+          setLoginMode(true);
+
+          setMessage("");
+
+        },1500);
+
+      }
+
+
+    }
+
+    catch(error){
+
+
+      setMessage(
+
+        error.response?.data?.message ||
+
+        "Something went wrong"
+
+      );
+
+
+    }
+
+  };
+
+  const googleLogin = ()=>{
+
+
+    window.location.href =
+
+    "http://localhost:5000/api/auth/google";
+
+
+  };
 
 return(
 
@@ -36,19 +139,30 @@ setDarkMode={setDarkMode}
 
 <main className="main-content">
 
+
 <div className="login-container">
+
 
 <div className="login-box">
 
-<h1>Login</h1>
 
-<p>
+<h1>
 
-This page will contain the login form for users to access their dashboard and manage product descriptions.
+{
 
-</p>
+loginMode ?
 
-<form>
+"Login"
+
+:
+
+"Register"
+
+}
+
+</h1>
+
+<form onSubmit={submitHandler}>
 
 <Input
 
@@ -57,6 +171,10 @@ label="Email"
 type="email"
 
 placeholder="Enter Email"
+
+value={email}
+
+onChange={(e)=>setEmail(e.target.value)}
 
 />
 
@@ -68,15 +186,99 @@ type="password"
 
 placeholder="Enter Password"
 
+value={password}
+
+onChange={(e)=>setPassword(e.target.value)}
+
 />
 
-<Button>
+<Button type="submit">
 
-Login
+
+{
+
+loginMode ?
+
+"Login"
+
+:
+
+"Register"
+
+}
 
 </Button>
 
 </form>
+
+<button
+
+className="google-btn"
+
+onClick={googleLogin}
+
+>
+
+Sign in with Google
+
+</button>
+
+{
+message &&
+
+<p
+
+style={{
+
+marginTop:"15px",
+
+fontWeight:"600"
+
+}}
+
+>
+
+{message}
+
+</p>
+
+}
+
+<p
+
+style={{
+
+cursor:"pointer",
+
+marginTop:"15px"
+
+}}
+
+onClick={()=>{
+
+setLoginMode(!loginMode);
+
+setMessage("");
+
+}}
+
+>
+
+{
+
+loginMode
+
+?
+
+"Don't have an account? Register"
+
+:
+
+"Already have an account? Login"
+
+}
+
+</p>
 
 </div>
 

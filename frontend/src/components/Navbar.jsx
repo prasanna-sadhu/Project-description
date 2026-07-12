@@ -1,4 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+
+import { AuthContext } from "../context/AuthContext";
+
 
 function Navbar({
 
@@ -8,13 +12,29 @@ setDarkMode
 
 }) {
 
+const { token, logout } = useContext(AuthContext);
+
+const navigate = useNavigate();
+
 const toggleTheme = () => {
 
 const newTheme = !darkMode;
 
 setDarkMode(newTheme);
 
-localStorage.setItem("theme",newTheme);
+localStorage.setItem(
+"theme",
+newTheme
+);
+
+};
+
+const handleLogout = () => {
+
+
+logout();
+
+navigate("/login");
 
 };
 
@@ -30,13 +50,57 @@ AI Product Description Generator
 
 <div className="nav-Links">
 
-<Link to="/">Home</Link>
+<Link to="/">
+Home
+</Link>
+<Link to="/about">
+About
+</Link>
 
-<Link to="/about">About</Link>
+{
 
-<Link to="/dashboard">Dashboard</Link>
+token &&
 
-<Link to="/login">Login</Link>
+<Link to="/dashboard">
+Dashboard
+</Link>
+
+}
+
+{
+
+token ?
+
+
+<Link
+
+to="/login"
+
+className="login-btn"
+
+onClick={handleLogout}
+
+>
+
+Logout
+
+</Link>
+:
+
+<Link
+
+to="/login"
+
+className="login-btn"
+
+>
+
+Login
+
+</Link>
+
+
+}
 
 <button
 
@@ -46,16 +110,27 @@ onClick={toggleTheme}
 
 >
 
-{darkMode ? "☀️" : "🌙"}
+{
+
+darkMode ? "☀️" : "🌙"
+
+}
+
 
 </button>
 
+
+
 </div>
+
 
 </nav>
 
+
 );
 
+
 }
+
 
 export default Navbar;

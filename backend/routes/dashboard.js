@@ -1,45 +1,92 @@
-const express = require("express");
-const router = express.Router();
-const Product = require("../models/Product");
+const express=require("express");
 
-router.get("/", async (req, res) => {
-  try {
-    const products = await Product.find().sort({ createdAt: -1 });
+const router=express.Router();
 
-    const totalDescriptions = products.length;
-    const productsGenerated = products.length;
+const Product=require("../models/Product");
 
-    const now = new Date();
+const verifyToken=require("../middleware/authMiddleware");
 
-    const thisMonth = products.filter((p) => {
-      const d = new Date(p.createdAt);
-      return (
-        d.getMonth() === now.getMonth() &&
-        d.getFullYear() === now.getFullYear()
-      );
-    }).length;
+router.get("/",verifyToken,async(req,res)=>{
 
-    let wordsGenerated = 0;
 
-    products.forEach((p) => {
-      wordsGenerated += p.keywords
-        ? p.keywords.split(" ").length
-        : 0;
-    });
+try{
 
-    res.json({
-      stats: {
-        totalDescriptions,
-        productsGenerated,
-        thisMonth,
-        wordsGenerated
-      },
-      recent: products
-    });
 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+const products = await Product.find({
+
+userId:req.user.id
+
+})
+.sort({
+
+createdAt:-1
+
 });
 
-module.exports = router;
+const totalDescriptions = products.length;
+
+const productsGenerated = products.length;
+
+const now = new Date();
+
+const thisMonth = products.filter((p)=>{
+
+
+const d = new Date(p.createdAt);
+
+
+return (
+
+d.getMonth()===now.getMonth()
+
+&&
+
+d.getFullYear()===now.getFullYear()
+
+);
+
+}).length;
+
+let wordsGenerated=0;
+
+products.forEach((p)=>{
+
+if(p.keywords){
+
+wordsGenerated += p.keywords.split(" ").length;
+
+}
+});
+
+res.json({
+
+stats:{
+
+totalDescriptions,
+
+productsGenerated,
+
+thisMonth,
+
+wordsGenerated
+
+},
+
+recent:products
+
+});
+
+}
+catch(error){
+
+res.status(500).json({
+
+message:error.message
+
+});
+
+}
+
+});
+
+module.exports=router;
