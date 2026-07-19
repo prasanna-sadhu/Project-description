@@ -1,92 +1,89 @@
-const express=require("express");
+const express = require("express");
 
-const router=express.Router();
+const router = express.Router();
 
-const Product=require("../models/Product");
+const Product = require("../models/Product");
 
-const verifyToken=require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/authMiddleware");
 
-router.get("/",verifyToken,async(req,res)=>{
+router.get("/", verifyToken, async (req, res) => {
 
+  try {
 
-try{
+    const products = await Product.find({
 
+      userId: req.user.id
 
-const products = await Product.find({
+    }).sort({
 
-userId:req.user.id
+      createdAt: -1
 
-})
-.sort({
+    });
 
-createdAt:-1
+    const totalDescriptions = products.length;
 
-});
+    const productsGenerated = products.length;
 
-const totalDescriptions = products.length;
+    const now = new Date();
 
-const productsGenerated = products.length;
+    const thisMonth = products.filter((product) => {
 
-const now = new Date();
+      const created = new Date(product.createdAt);
 
-const thisMonth = products.filter((p)=>{
+      return (
 
+        created.getMonth() === now.getMonth() &&
 
-const d = new Date(p.createdAt);
+        created.getFullYear() === now.getFullYear()
 
+      );
 
-return (
+    }).length;
 
-d.getMonth()===now.getMonth()
+    let wordsGenerated = 0;
 
-&&
+    products.forEach((product) => {
 
-d.getFullYear()===now.getFullYear()
+      if (product.description) {
 
-);
+        wordsGenerated += product.description
+          .trim()
+          .split(/\s+/).length;
 
-}).length;
+      }
 
-let wordsGenerated=0;
+    });
 
-products.forEach((p)=>{
+    res.json({
 
-if(p.keywords){
+      stats: {
 
-wordsGenerated += p.keywords.split(" ").length;
+        totalDescriptions,
 
-}
-});
+        productsGenerated,
 
-res.json({
+        thisMonth,
 
-stats:{
+        wordsGenerated
 
-totalDescriptions,
+      },
 
-productsGenerated,
+      recent: products
 
-thisMonth,
+    });
 
-wordsGenerated
+  }
 
-},
+  catch (error) {
 
-recent:products
+    res.status(500).json({
 
-});
+      message: error.message
 
-}
-catch(error){
+    });
 
-res.status(500).json({
-
-message:error.message
-
-});
-
-}
+  }
 
 });
 
-module.exports=router;
+module.exports = router;

@@ -1,267 +1,222 @@
-import {useState} from "react";
-
+import { useState } from "react";
 import axios from "axios";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 import {
-Input,
-Button,
-Loader,
-Toast
-}
-from "../components/ui";
+  Input,
+  Button,
+  Loader,
+  Toast
+} from "../components/ui";
 
-function Generator({darkMode,setDarkMode}){
+function Generator({ darkMode, setDarkMode }) {
 
-const [productName,setProductName]=useState("");
+  const [productName, setProductName] = useState("");
+  const [category, setCategory] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [tone, setTone] = useState("");
 
-const [category,setCategory]=useState("");
+  const [description, setDescription] = useState("");
 
-const [keywords,setKeywords]=useState("");
+  const [loading, setLoading] = useState(false);
 
-const [tone,setTone]=useState("");
+  const [showToast, setShowToast] = useState(false);
 
-const [description,setDescription]=useState("");
+  const [toastMessage, setToastMessage] = useState("");
 
-const [loading,setLoading]=useState(false);
+  const generateDescription = async (e) => {
 
-const [showToast,setShowToast]=useState(false);
+    e.preventDefault();
 
-const [toastMessage,setToastMessage]=useState("");
+    try {
 
-const generateDescription=async(e)=>{
+      setLoading(true);
 
-e.preventDefault();
+      const token = localStorage.getItem("token");
 
-try{
+      const res = await axios.post(
 
-setLoading(true);
+        "http://localhost:5000/api/ai/generate-description",
 
-const token = localStorage.getItem("token");
+        {
 
-const res = await axios.post(
+          name: productName,
+          category,
+          keywords,
+          tone
 
-"http://localhost:5000/api/products/generate",
+        },
 
-{
+        {
 
-name:productName,
+          headers: {
 
-category,
+            Authorization: `Bearer ${token}`
 
-keywords,
+          }
 
-tone
+        }
 
-},
+      );
 
-{
+      setDescription(res.data.description);
 
-headers:{
+      setToastMessage("AI Description Generated Successfully");
 
-Authorization:`Bearer ${token}`
+      setShowToast(true);
 
-}
+      // Notify dashboard to refresh
+      window.dispatchEvent(
+        new Event("dashboardUpdate")
+      );
 
-}
+    }
 
-);
+    catch (error) {
 
-setDescription(
+      console.log(error.response?.data);
 
-res.data.description
+      setToastMessage(
 
-);
+        error.response?.data?.message ||
 
-setToastMessage(
+        "AI Generation Failed"
 
-"Generated Successfully"
+      );
 
-);
+      setShowToast(true);
 
-setShowToast(true);
+    }
 
-window.dispatchEvent(
+    finally {
 
-new Event("dashboardUpdate")
+      setLoading(false);
 
-);
-}
+      setTimeout(() => {
 
-catch(error){
+        setShowToast(false);
 
-console.log(
+      }, 2000);
 
-error.response?.data
+    }
 
-);
+  };
 
-setToastMessage(
+  return (
 
-"Generation Failed"
+    <>
 
-);
+      <Navbar
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
-setShowToast(true);
+      <main className="main-content">
 
-}
+        <div className="generator-container">
 
-finally{
+          <div className="generator-form">
 
+            <h1>
 
-setLoading(false);
+              AI Product Description Generator
 
+            </h1>
 
-setTimeout(()=>{
+            <form onSubmit={generateDescription}>
 
-setShowToast(false);
+              <Input
+                label="Product Name"
+                value={productName}
+                onChange={(e) =>
+                  setProductName(e.target.value)
+                }
+              />
 
-},2000);
+              <Input
+                label="Category"
+                value={category}
+                onChange={(e) =>
+                  setCategory(e.target.value)
+                }
+              />
 
-}
+              <Input
+                label="Keywords"
+                value={keywords}
+                onChange={(e) =>
+                  setKeywords(e.target.value)
+                }
+              />
 
-};
+              <Input
+                label="Tone"
+                value={tone}
+                onChange={(e) =>
+                  setTone(e.target.value)
+                }
+              />
 
-return(
+              <Button type="submit">
 
-<>
+                Generate Description
 
-<Navbar
+              </Button>
 
-darkMode={darkMode}
+            </form>
 
-setDarkMode={setDarkMode}
+          </div>
 
-/>
+          <div className="generator-output">
 
-<main className="main-content">
+            <h2>
 
-<div className="generator-container">
+              Generated Description
 
-<div className="generator-form">
+            </h2>
 
-<h1>
+            {loading && <Loader />}
 
-AI Product Description Generator
+            {!loading && description && (
 
-</h1>
-<form onSubmit={generateDescription}>
+              <div className="output-box">
 
-<Input
+                <p>{description}</p>
 
-label="Product Name"
+              </div>
 
-value={productName}
+            )}
 
-onChange={(e)=>setProductName(e.target.value)}
+            {!loading && !description && (
 
-/>
+              <p>
 
-<Input
+                Your AI-generated description will appear here...
 
-label="Category"
+              </p>
 
-value={category}
+            )}
 
-onChange={(e)=>setCategory(e.target.value)}
+            {showToast && (
 
-/>
-<Input
+              <Toast message={toastMessage} />
 
-label="Keywords"
+            )}
 
-value={keywords}
+          </div>
 
-onChange={(e)=>setKeywords(e.target.value)}
+        </div>
 
-/>
+      </main>
 
-<Input
+      <Footer />
 
-label="Tone"
+    </>
 
-value={tone}
-
-onChange={(e)=>setTone(e.target.value)}
-
-/>
-<Button type="submit">
-
-Generate Description
-
-</Button>
-
-</form>
-
-</div>
-
-<div className="generator-output">
-
-
-<h2>
-
-Generated Description
-
-</h2>
-
-{
-
-loading && <Loader/>
-
-}
-
-{
-
-!loading && description &&
-
-<div className="output-box">
-
-<p>
-
-{description}
-
-</p>
-
-</div>
+  );
 
 }
-
-{
-
-!loading && !description &&
-
-<p>
-
-Your description will appear here...
-
-</p>
-
-}
-
-{
-
-showToast &&
-
-<Toast message={toastMessage}/>
-
-}
-
-</div>
-
-</div>
-
-</main>
-
-<Footer/>
-
-</>
-
-);
-
-
-}
-
 
 export default Generator;

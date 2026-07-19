@@ -7,9 +7,7 @@ import axios from "axios";
 
 function Dashboard({ darkMode, setDarkMode }) {
 
-
   const navigate = useNavigate();
-
 
   const [stats, setStats] = useState({
 
@@ -23,25 +21,15 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   });
 
-
-
   const [recentDescriptions,setRecentDescriptions] = useState([]);
 
   const [searchTerm,setSearchTerm] = useState("");
 
-
-
-
-
   const fetchDashboard = async()=>{
-
 
     try{
 
-
       const token = localStorage.getItem("token");
-
-
 
       if(!token){
 
@@ -50,9 +38,6 @@ function Dashboard({ darkMode, setDarkMode }) {
         return;
 
       }
-
-
-
       const res = await axios.get(
 
         "http://localhost:5000/api/dashboard",
@@ -69,8 +54,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
-
       setStats(
 
         res.data.stats
@@ -86,7 +69,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
     }
-
 
     catch(error){
 
@@ -108,22 +90,14 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       }
 
-
     }
 
-
   };
-
-
-
-
 
   useEffect(()=>{
 
 
     fetchDashboard();
-
-
 
     window.addEventListener(
 
@@ -133,10 +107,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     );
 
-
-
     return()=>{
-
 
       window.removeEventListener(
 
@@ -151,22 +122,11 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   },[]);
-
-
-
-
-
-
-
   const deleteProduct = async(id)=>{
-
 
     try{
 
-
       const token = localStorage.getItem("token");
-
-
 
       await axios.delete(
 
@@ -184,14 +144,9 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
-
       fetchDashboard();
 
-
-
     }
-
 
     catch(error){
 
@@ -204,17 +159,9 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
     }
 
-
   };
-
-
-
-
-
-
 
   const editProduct=(product)=>{
 
@@ -227,13 +174,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   };
-
-
-
-
-
-
-
 
   const filteredProducts = recentDescriptions.filter((item)=>{
 
@@ -267,12 +207,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   });
-
-
-
-
-
-
 
 return(
 
