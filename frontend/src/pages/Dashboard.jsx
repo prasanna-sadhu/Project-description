@@ -29,8 +29,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   });
 
-
-
   const [recentDescriptions,setRecentDescriptions] = useState([]);
 
 
@@ -49,9 +47,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   const [deleteId,setDeleteId] = useState(null);
-
-
-
 
   const showMessage=(message)=>{
 
@@ -75,19 +70,11 @@ function Dashboard({ darkMode, setDarkMode }) {
   };
 
 
-
-
-
-
   const fetchDashboard = async()=>{
-
 
     try{
 
-
       const token = localStorage.getItem("token");
-
-
 
       if(!token){
 
@@ -99,9 +86,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
       }
-
-
-
 
       const res = await axios.get(
 
@@ -118,12 +102,7 @@ function Dashboard({ darkMode, setDarkMode }) {
         }
 
       );
-
-
-
       setStats(res.data.stats);
-
-
 
       setRecentDescriptions(
 
@@ -131,13 +110,9 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
-
     }
 
-
     catch(error){
-
 
       console.log(
 
@@ -152,23 +127,12 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
     }
-
-
   };
-
-
-
-
-
 
   useEffect(()=>{
 
-
     fetchDashboard();
-
-
 
     window.addEventListener(
 
@@ -178,10 +142,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     );
 
-
-
     return()=>{
-
 
       window.removeEventListener(
 
@@ -197,12 +158,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   },[]);
 
-
-
-
-
-
-
   const confirmDelete=(id)=>{
 
 
@@ -214,21 +169,11 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   };
 
-
-
-
-
-
-
   const deleteProduct=async()=>{
-
 
     try{
 
-
       const token = localStorage.getItem("token");
-
-
 
       await axios.delete(
 
@@ -246,15 +191,9 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-
-
       setShowModal(false);
 
-
-
       fetchDashboard();
-
-
 
       showMessage(
 
@@ -284,13 +223,6 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   };
-
-
-
-
-
-
-
   const editProduct=(product)=>{
 
 
@@ -303,19 +235,10 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   };
 
-
-
-
-
-
-
-
   const filteredProducts = recentDescriptions.filter((item)=>{
 
 
     const product=item.product || item;
-
-
 
     return(
 
@@ -324,43 +247,25 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       .includes(searchTerm.toLowerCase())
 
-
-
       ||
-
-
 
       product.category?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
-
-
       ||
-
-
-
       product.tone?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
-
     );
 
-
   });
-
-
-
-
-
-
 
 return(
 
 
 <div className="page-container">
-
 
 <Navbar
 
@@ -370,16 +275,10 @@ setDarkMode={setDarkMode}
 
 />
 
-
-
-
-
 <main className="main-content">
 
 
 <div className="dashboard-section">
-
-
 
 <h1>
 
@@ -387,13 +286,7 @@ Dashboard
 
 </h1>
 
-
-
-
-
 <div className="stats-grid">
-
-
 
 <div className="dashboard-card">
 
@@ -403,9 +296,6 @@ Dashboard
 
 </div>
 
-
-
-
 <div className="dashboard-card">
 
 <h3>Products Generated</h3>
@@ -413,9 +303,6 @@ Dashboard
 <p>{stats.productsGenerated}</p>
 
 </div>
-
-
-
 
 <div className="dashboard-card">
 
@@ -425,9 +312,6 @@ Dashboard
 
 </div>
 
-
-
-
 <div className="dashboard-card">
 
 <h3>Words Generated</h3>
@@ -436,21 +320,9 @@ Dashboard
 
 </div>
 
-
-
-
 </div>
 
-
-
-
-
-
-
-
 <div className="preview-box">
-
-
 
 <div className="preview-header">
 
@@ -460,8 +332,6 @@ Dashboard
 Product Preview
 
 </h2>
-
-
 
 <input
 
@@ -481,21 +351,11 @@ setSearchTerm(e.target.value)
 
 />
 
-
 </div>
-
-
-
-
-
-
 
 <div className="table-container">
 
-
-
 <table>
-
 
 <thead>
 
@@ -513,19 +373,11 @@ setSearchTerm(e.target.value)
 
 </thead>
 
-
-
-
-
 <tbody>
-
 
 {
 
-
 filteredProducts.length>0 ?
-
-
 
 filteredProducts.map((product,index)=>(
 
@@ -541,8 +393,6 @@ filteredProducts.map((product,index)=>(
 
 <td>{product.tone}</td>
 
-
-
 <td>
 
 
@@ -556,13 +406,7 @@ Edit
 
 </Button>
 
-
-
-
 <span> | </span>
-
-
-
 
 <Button
 
@@ -573,23 +417,13 @@ onClick={()=>confirmDelete(product._id)}
 Delete
 
 </Button>
-
-
-
 </td>
-
 
 </tr>
 
-
-
 ))
 
-
-
 :
-
-
 
 <tr>
 
@@ -601,45 +435,23 @@ No products found.
 
 Create your first AI description.
 
-
 </td>
-
 
 </tr>
 
-
-
 }
-
-
 
 </tbody>
 
-
 </table>
 
-
+</div>
 
 </div>
 
-
-
-
 </div>
-
-
-
-
-
-</div>
-
 
 </main>
-
-
-
-
-
 
 {
 
@@ -647,13 +459,7 @@ showToast &&
 
 <Toast message={toastMessage}/>
 
-
 }
-
-
-
-
-
 
 <Modal
 
@@ -665,14 +471,11 @@ title="Delete Product"
 
 >
 
-
 <p>
 
 Are you sure you want to delete this product?
 
 </p>
-
-
 
 <Button
 
@@ -684,28 +487,14 @@ Confirm Delete
 
 </Button>
 
-
 </Modal>
-
-
-
-
-
 
 <Footer/>
 
-
-
-
 </div>
-
-
 
 );
 
-
 }
-
-
 
 export default Dashboard;
