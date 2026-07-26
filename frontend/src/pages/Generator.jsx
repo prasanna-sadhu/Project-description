@@ -1,221 +1,167 @@
 import { useState } from "react";
 import axios from "axios";
-
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { Input,Button,Loader,Toast } from "../components/ui";
 
-import {
-  Input,
-  Button,
-  Loader,
-  Toast
-} from "../components/ui";
+function Generator({darkMode,setDarkMode}){
 
-function Generator({ darkMode, setDarkMode }) {
+const [productName,setProductName]=useState("");
+const [category,setCategory]=useState("");
+const [keywords,setKeywords]=useState("");
+const [tone,setTone]=useState("");
+const [description,setDescription]=useState("");
+const [loading,setLoading]=useState(false);
+const [showToast,setShowToast]=useState(false);
+const [toastMessage,setToastMessage]=useState("");
 
-  const [productName, setProductName] = useState("");
-  const [category, setCategory] = useState("");
-  const [keywords, setKeywords] = useState("");
-  const [tone, setTone] = useState("");
+const generateDescription=async(e)=>{
 
-  const [description, setDescription] = useState("");
+e.preventDefault();
 
-  const [loading, setLoading] = useState(false);
+if(!productName||!category||!keywords||!tone){
 
-  const [showToast, setShowToast] = useState(false);
+setToastMessage("All fields are required");
+setShowToast(true);
+return;
 
-  const [toastMessage, setToastMessage] = useState("");
+}
 
-  const generateDescription = async (e) => {
+try{
 
-    e.preventDefault();
+setLoading(true);
 
-    try {
+const token=localStorage.getItem("token");
 
-      setLoading(true);
+const res=await axios.post(
 
-      const token = localStorage.getItem("token");
+"http://localhost:5000/api/ai/generate-description",
 
-      const res = await axios.post(
+{
+name:productName,
+category,
+keywords,
+tone
+},
 
-        "http://localhost:5000/api/ai/generate-description",
+{
+headers:{
+Authorization:`Bearer ${token}`
+}
+}
 
-        {
+);
 
-          name: productName,
-          category,
-          keywords,
-          tone
+setDescription(res.data.description);
 
-        },
+setToastMessage("AI Description Generated Successfully");
 
-        {
+setShowToast(true);
 
-          headers: {
+window.dispatchEvent(new Event("dashboardUpdate"));
 
-            Authorization: `Bearer ${token}`
+}
 
-          }
+catch(error){
 
-        }
+setToastMessage(
+error.response?.data?.message||"AI Generation Failed"
+);
 
-      );
+setShowToast(true);
 
-      setDescription(res.data.description);
+}
 
-      setToastMessage("AI Description Generated Successfully");
+finally{
 
-      setShowToast(true);
+setLoading(false);
 
-      // Notify dashboard to refresh
-      window.dispatchEvent(
-        new Event("dashboardUpdate")
-      );
+setTimeout(()=>{
 
-    }
+setShowToast(false);
 
-    catch (error) {
+},2000);
 
-      console.log(error.response?.data);
+}
 
-      setToastMessage(
+};
 
-        error.response?.data?.message ||
+return(
+<>
+<Navbar darkMode={darkMode} setDarkMode={setDarkMode}/>
 
-        "AI Generation Failed"
+<main className="main-content">
 
-      );
+<div className="generator-container">
 
-      setShowToast(true);
+<div className="generator-form">
 
-    }
+<h1>AI Product Description Generator</h1>
 
-    finally {
+<form onSubmit={generateDescription}>
 
-      setLoading(false);
+<Input
+label="Product Name"
+value={productName}
+onChange={(e)=>setProductName(e.target.value)}
+/>
 
-      setTimeout(() => {
+<Input
+label="Category"
+value={category}
+onChange={(e)=>setCategory(e.target.value)}
+/>
 
-        setShowToast(false);
+<Input
+label="Keywords"
+value={keywords}
+onChange={(e)=>setKeywords(e.target.value)}
+/>
 
-      }, 2000);
+<Input
+label="Tone"
+value={tone}
+onChange={(e)=>setTone(e.target.value)}
+/>
 
-    }
+<Button type="submit">
+Generate Description
+</Button>
 
-  };
+</form>
 
-  return (
+</div>
 
-    <>
+<div className="generator-output">
 
-      <Navbar
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-      />
+<h2>Generated Description</h2>
 
-      <main className="main-content">
+{loading&&<Loader/>}
 
-        <div className="generator-container">
+{!loading&&description&&
+<div className="output-box">
+<p>{description}</p>
+</div>
+}
 
-          <div className="generator-form">
+{!loading&&!description&&
+<p>Your AI-generated description will appear here...</p>
+}
 
-            <h1>
+{showToast&&
+<Toast message={toastMessage}/>
+}
 
-              AI Product Description Generator
+</div>
 
-            </h1>
+</div>
 
-            <form onSubmit={generateDescription}>
+</main>
 
-              <Input
-                label="Product Name"
-                value={productName}
-                onChange={(e) =>
-                  setProductName(e.target.value)
-                }
-              />
+<Footer/>
 
-              <Input
-                label="Category"
-                value={category}
-                onChange={(e) =>
-                  setCategory(e.target.value)
-                }
-              />
-
-              <Input
-                label="Keywords"
-                value={keywords}
-                onChange={(e) =>
-                  setKeywords(e.target.value)
-                }
-              />
-
-              <Input
-                label="Tone"
-                value={tone}
-                onChange={(e) =>
-                  setTone(e.target.value)
-                }
-              />
-
-              <Button type="submit">
-
-                Generate Description
-
-              </Button>
-
-            </form>
-
-          </div>
-
-          <div className="generator-output">
-
-            <h2>
-
-              Generated Description
-
-            </h2>
-
-            {loading && <Loader />}
-
-            {!loading && description && (
-
-              <div className="output-box">
-
-                <p>{description}</p>
-
-              </div>
-
-            )}
-
-            {!loading && !description && (
-
-              <p>
-
-                Your AI-generated description will appear here...
-
-              </p>
-
-            )}
-
-            {showToast && (
-
-              <Toast message={toastMessage} />
-
-            )}
-
-          </div>
-
-        </div>
-
-      </main>
-
-      <Footer />
-
-    </>
-
-  );
+</>
+);
 
 }
 
