@@ -1,11 +1,11 @@
-import {
-createContext,
-useState
-} from "react";
+import {createContext,useState} from "react";
+
 
 export const AuthContext=createContext();
 
+
 export function AuthProvider({children}){
+
 
 const [token,setToken]=useState(
 
@@ -13,20 +13,26 @@ localStorage.getItem("token")
 
 );
 
-const login=(jwt)=>{
+
+
+const login=(newToken)=>{
+
 
 localStorage.setItem(
 
 "token",
 
-jwt
+newToken
 
 );
 
-setToken(jwt);
+
+setToken(newToken);
 
 
 };
+
+
 
 const logout=()=>{
 
@@ -42,6 +48,8 @@ setToken(null);
 
 
 };
+
+
 
 return(
 
@@ -59,9 +67,14 @@ logout
 
 >
 
+
 {children}
+
 
 </AuthContext.Provider>
 
+
 );
+
+
 }
