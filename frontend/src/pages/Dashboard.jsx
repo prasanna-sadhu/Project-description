@@ -4,40 +4,105 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
 
+import {
+  Toast,
+  Modal,
+  Button
+} from "../components/ui";
+
 
 function Dashboard({ darkMode, setDarkMode }) {
 
+
   const navigate = useNavigate();
 
-  const [stats, setStats] = useState({
 
-    totalDescriptions: 0,
+  const [stats,setStats] = useState({
 
-    productsGenerated: 0,
+    totalDescriptions:0,
 
-    thisMonth: 0,
+    productsGenerated:0,
 
-    wordsGenerated: 0,
+    thisMonth:0,
+
+    wordsGenerated:0
 
   });
 
+
+
   const [recentDescriptions,setRecentDescriptions] = useState([]);
+
 
   const [searchTerm,setSearchTerm] = useState("");
 
+
+
+  const [showToast,setShowToast] = useState(false);
+
+
+  const [toastMessage,setToastMessage] = useState("");
+
+
+
+  const [showModal,setShowModal] = useState(false);
+
+
+  const [deleteId,setDeleteId] = useState(null);
+
+
+
+
+  const showMessage=(message)=>{
+
+
+    setToastMessage(message);
+
+
+    setShowToast(true);
+
+
+
+    setTimeout(()=>{
+
+
+      setShowToast(false);
+
+
+    },2000);
+
+
+  };
+
+
+
+
+
+
   const fetchDashboard = async()=>{
+
 
     try{
 
+
       const token = localStorage.getItem("token");
+
+
 
       if(!token){
 
+
         navigate("/login");
+
 
         return;
 
+
       }
+
+
+
+
       const res = await axios.get(
 
         "http://localhost:5000/api/dashboard",
@@ -54,11 +119,10 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
-      setStats(
 
-        res.data.stats
 
-      );
+      setStats(res.data.stats);
+
 
 
       setRecentDescriptions(
@@ -68,36 +132,43 @@ function Dashboard({ darkMode, setDarkMode }) {
       );
 
 
+
     }
+
 
     catch(error){
 
 
       console.log(
 
-        "Dashboard Error:",
-
-        error.response?.data || error.message
+        error.response?.data
 
       );
 
 
-      if(error.response?.status===401){
+      showMessage(
 
-        localStorage.removeItem("token");
+        "Failed to load dashboard"
 
-        navigate("/login");
+      );
 
-      }
 
     }
 
+
   };
+
+
+
+
+
 
   useEffect(()=>{
 
 
     fetchDashboard();
+
+
 
     window.addEventListener(
 
@@ -107,7 +178,10 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     );
 
+
+
     return()=>{
+
 
       window.removeEventListener(
 
@@ -122,15 +196,43 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
   },[]);
-  const deleteProduct = async(id)=>{
+
+
+
+
+
+
+
+  const confirmDelete=(id)=>{
+
+
+    setDeleteId(id);
+
+
+    setShowModal(true);
+
+
+  };
+
+
+
+
+
+
+
+  const deleteProduct=async()=>{
+
 
     try{
 
+
       const token = localStorage.getItem("token");
+
+
 
       await axios.delete(
 
-        `http://localhost:5000/api/products/${id}`,
+        `http://localhost:5000/api/products/${deleteId}`,
 
         {
 
@@ -144,24 +246,50 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
+
+
+      setShowModal(false);
+
+
+
       fetchDashboard();
 
+
+
+      showMessage(
+
+        "Product deleted successfully"
+
+      );
+
+
+
     }
+
 
     catch(error){
 
 
-      console.log(
+      console.log(error.response?.data);
 
-        "Delete Error",
 
-        error.response?.data
+      showMessage(
+
+        "Delete failed"
 
       );
 
+
     }
 
+
   };
+
+
+
+
+
+
 
   const editProduct=(product)=>{
 
@@ -175,6 +303,13 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   };
 
+
+
+
+
+
+
+
   const filteredProducts = recentDescriptions.filter((item)=>{
 
 
@@ -182,21 +317,28 @@ function Dashboard({ darkMode, setDarkMode }) {
 
 
 
-    return (
+    return(
+
 
       product.name?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
 
+
       ||
+
+
 
       product.category?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
 
+
       ||
+
+
 
       product.tone?.toLowerCase()
 
@@ -208,7 +350,14 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   });
 
+
+
+
+
+
+
 return(
+
 
 <div className="page-container">
 
@@ -223,18 +372,27 @@ setDarkMode={setDarkMode}
 
 
 
+
+
 <main className="main-content">
 
 
 <div className="dashboard-section">
 
 
+
 <h1>
+
 Dashboard
+
 </h1>
 
 
+
+
+
 <div className="stats-grid">
+
 
 
 <div className="dashboard-card">
@@ -244,6 +402,7 @@ Dashboard
 <p>{stats.totalDescriptions}</p>
 
 </div>
+
 
 
 
@@ -257,6 +416,7 @@ Dashboard
 
 
 
+
 <div className="dashboard-card">
 
 <h3>This Month</h3>
@@ -264,6 +424,7 @@ Dashboard
 <p>{stats.thisMonth}</p>
 
 </div>
+
 
 
 
@@ -276,7 +437,13 @@ Dashboard
 </div>
 
 
+
+
 </div>
+
+
+
+
 
 
 
@@ -284,12 +451,16 @@ Dashboard
 <div className="preview-box">
 
 
+
 <div className="preview-header">
 
 
 <h2>
+
 Product Preview
+
 </h2>
+
 
 
 <input
@@ -302,7 +473,11 @@ placeholder="Search Product..."
 
 value={searchTerm}
 
-onChange={(e)=>setSearchTerm(e.target.value)}
+onChange={(e)=>
+
+setSearchTerm(e.target.value)
+
+}
 
 />
 
@@ -311,7 +486,12 @@ onChange={(e)=>setSearchTerm(e.target.value)}
 
 
 
+
+
+
+
 <div className="table-container">
+
 
 
 <table>
@@ -334,44 +514,39 @@ onChange={(e)=>setSearchTerm(e.target.value)}
 </thead>
 
 
+
+
+
 <tbody>
 
 
 {
 
+
 filteredProducts.length>0 ?
 
-filteredProducts.map((product,index)=>{
 
 
-return(
+filteredProducts.map((product,index)=>(
+
 
 <tr key={product._id || index}>
 
 
 <td>{product.name}</td>
 
+
 <td>{product.category}</td>
 
+
 <td>{product.tone}</td>
+
 
 
 <td>
 
 
-<span
-
-style={{
-
-color:"#2563eb",
-
-cursor:"pointer",
-
-fontWeight:"600",
-
-marginRight:"12px"
-
-}}
+<Button
 
 onClick={()=>editProduct(product)}
 
@@ -379,35 +554,26 @@ onClick={()=>editProduct(product)}
 
 Edit
 
-</span>
+</Button>
 
 
 
-|
+
+<span> | </span>
 
 
 
-<span
 
-style={{
+<Button
 
-color:"#dc2626",
-
-cursor:"pointer",
-
-fontWeight:"600",
-
-marginLeft:"12px"
-
-}}
-
-onClick={()=>deleteProduct(product._id)}
+onClick={()=>confirmDelete(product._id)}
 
 >
 
 Delete
 
-</span>
+</Button>
+
 
 
 </td>
@@ -415,25 +581,36 @@ Delete
 
 </tr>
 
-)
 
 
-})
+))
+
+
 
 :
 
+
+
 <tr>
+
 
 <td colSpan="4">
 
-No Matching Products Found
+
+No products found.
+
+Create your first AI description.
+
 
 </td>
+
 
 </tr>
 
 
+
 }
+
 
 
 </tbody>
@@ -442,10 +619,16 @@ No Matching Products Found
 </table>
 
 
+
 </div>
 
 
+
+
 </div>
+
+
+
 
 
 </div>
@@ -455,16 +638,74 @@ No Matching Products Found
 
 
 
+
+
+
+{
+
+showToast &&
+
+<Toast message={toastMessage}/>
+
+
+}
+
+
+
+
+
+
+<Modal
+
+isOpen={showModal}
+
+onClose={()=>setShowModal(false)}
+
+title="Delete Product"
+
+>
+
+
+<p>
+
+Are you sure you want to delete this product?
+
+</p>
+
+
+
+<Button
+
+onClick={deleteProduct}
+
+>
+
+Confirm Delete
+
+</Button>
+
+
+</Modal>
+
+
+
+
+
+
 <Footer/>
 
 
+
+
 </div>
+
 
 
 );
 
 
 }
+
 
 
 export default Dashboard;
