@@ -4,7 +4,7 @@ const router = express.Router();
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const verifyToken = require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/authmiddleware");
 
 const Product = require("../models/Product");
 

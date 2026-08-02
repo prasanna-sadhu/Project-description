@@ -4,7 +4,7 @@ const router = express.Router();
 
 const Product = require("../models/Product");
 
-const verifyToken = require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/authmiddleware");
 
 router.get("/", verifyToken, async (req, res) => {
 
