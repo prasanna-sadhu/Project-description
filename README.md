@@ -130,3 +130,65 @@ AI-Product-Description/
 │
 └── README.md
 ```
+## Tech Stack Summary
+
+This project is a full-stack web application developed using the MERN stack with AI integration to generate product descriptions for food processing e-commerce listings. The application combines a modern frontend, a secure backend, a cloud-hosted database, AI services, and cloud deployment platforms.
+
+### Frontend Technologies
+
+**React.js** is used to build a dynamic and responsive user interface using reusable components. It enables efficient rendering and provides a smooth user experience.
+
+**Vite** is used as the frontend build tool because it offers fast development, hot module replacement (HMR), and optimized production builds.
+
+**React Router DOM** provides client-side routing, allowing seamless navigation between pages such as Home, About, Login, Dashboard, and Product Generator without refreshing the page.
+
+**Axios** is used to send HTTP requests from the frontend to the backend APIs for user authentication, product management, dashboard operations, and AI-generated product descriptions.
+
+**HTML5, CSS3, and JavaScript (ES6)** are used to create the application's structure, styling, responsiveness, and interactive functionality.
+
+### Backend Technologies
+
+**Node.js** serves as the JavaScript runtime environment that executes server-side code efficiently and supports asynchronous operations.
+
+**Express.js** is the backend framework used to develop RESTful APIs, manage routing, process client requests, and integrate authentication, AI services, and the database.
+
+### Database
+
+**MongoDB Atlas** is a cloud-based NoSQL database that stores user accounts, generated product descriptions, and other application data securely.
+
+**Mongoose** is used as the Object Data Modeling (ODM) library to define schemas, validate data, and simplify database operations.
+
+### Authentication and Security
+
+**JSON Web Token (JWT)** is used for secure authentication by generating tokens after successful login, allowing users to access protected routes.
+
+**Passport.js** is used to implement Google OAuth 2.0 authentication, enabling users to sign in using their Google accounts.
+
+**Google OAuth 2.0** provides secure third-party authentication without requiring users to create separate login credentials.
+
+**bcrypt** encrypts user passwords before storing them in the database, improving application security.
+
+**Express Validator** validates user input before processing requests, helping prevent invalid or malicious data.
+
+### Artificial Intelligence
+
+**Google Gemini API** powers the AI functionality of the application. Based on the product details entered by the user, it generates professional, informative, and e-commerce-ready product descriptions.
+
+### Deployment
+
+**Vercel** hosts the React frontend and provides automatic deployment from GitHub, HTTPS support, and global content delivery.
+Link:https://project-description-ten.vercel.app/
+
+
+**Render** hosts the Node.js and Express backend, making the REST APIs publicly accessible and securely connected to MongoDB Atlas.
+
+Link:https://project-description.onrender.com
+
+### Version Control
+
+**Git** is used for version control to track source code changes and manage development history.
+
+**GitHub** hosts the project repository, enabling collaboration, code management, and automated deployment to Vercel and Render.
+
+Together, these technologies create a scalable, secure, and responsive full-stack application capable of generating AI-powered product descriptions while providing authentication, database management, and cloud deployment.
+
