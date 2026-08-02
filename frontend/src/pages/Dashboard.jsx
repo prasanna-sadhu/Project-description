@@ -11,6 +11,9 @@ import {
 } from "../components/ui";
 
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 function Dashboard({ darkMode, setDarkMode }) {
 
 
@@ -29,11 +32,11 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   });
 
+
   const [recentDescriptions,setRecentDescriptions] = useState([]);
 
 
   const [searchTerm,setSearchTerm] = useState("");
-
 
 
   const [showToast,setShowToast] = useState(false);
@@ -42,11 +45,12 @@ function Dashboard({ darkMode, setDarkMode }) {
   const [toastMessage,setToastMessage] = useState("");
 
 
-
   const [showModal,setShowModal] = useState(false);
 
 
   const [deleteId,setDeleteId] = useState(null);
+
+
 
   const showMessage=(message)=>{
 
@@ -70,11 +74,17 @@ function Dashboard({ darkMode, setDarkMode }) {
   };
 
 
+
+
   const fetchDashboard = async()=>{
+
 
     try{
 
+
       const token = sessionStorage.getItem("token");
+
+
 
       if(!token){
 
@@ -89,7 +99,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       const res = await axios.get(
 
-        "http://localhost:5000/api/dashboard",
+        `${API_URL}/api/dashboard`,
 
         {
 
@@ -102,7 +112,11 @@ function Dashboard({ darkMode, setDarkMode }) {
         }
 
       );
+
+
+
       setStats(res.data.stats);
+
 
       setRecentDescriptions(
 
@@ -110,9 +124,12 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       );
 
+
     }
 
+
     catch(error){
+
 
       console.log(
 
@@ -121,16 +138,21 @@ function Dashboard({ darkMode, setDarkMode }) {
       );
 
 
+
       showMessage(
 
         "Failed to load dashboard"
 
       );
 
+
     }
+
   };
 
+
   useEffect(()=>{
+
 
     fetchDashboard();
 
@@ -142,7 +164,10 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     );
 
+
+
     return()=>{
+
 
       window.removeEventListener(
 
@@ -169,15 +194,22 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   };
 
+
   const deleteProduct=async()=>{
+
 
     try{
 
+
       const token = sessionStorage.getItem("token");
+
+
+
 
       await axios.delete(
 
-        `http://localhost:5000/api/products/${deleteId}`,
+
+        `${API_URL}/api/products/${deleteId}`,
 
         {
 
@@ -189,40 +221,35 @@ function Dashboard({ darkMode, setDarkMode }) {
 
         }
 
+
       );
 
       setShowModal(false);
 
       fetchDashboard();
-
       showMessage(
+
 
         "Product deleted successfully"
 
       );
 
-
-
     }
-
 
     catch(error){
 
-
       console.log(error.response?.data);
 
-
       showMessage(
+
 
         "Delete failed"
 
       );
 
-
     }
-
-
   };
+
   const editProduct=(product)=>{
 
 
@@ -240,6 +267,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     const product=item.product || item;
 
+
     return(
 
 
@@ -247,18 +275,25 @@ function Dashboard({ darkMode, setDarkMode }) {
 
       .includes(searchTerm.toLowerCase())
 
+
       ||
+
 
       product.category?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
+
       ||
+
+
       product.tone?.toLowerCase()
 
       .includes(searchTerm.toLowerCase())
 
+
     );
+
 
   });
 
@@ -274,11 +309,11 @@ darkMode={darkMode}
 setDarkMode={setDarkMode}
 
 />
-
 <main className="main-content">
 
 
 <div className="dashboard-section">
+
 
 <h1>
 
@@ -290,15 +325,19 @@ Dashboard
 
 <div className="dashboard-card">
 
+
 <h3>Total Descriptions</h3>
 
+
 <p>{stats.totalDescriptions}</p>
+
 
 </div>
 
 <div className="dashboard-card">
 
 <h3>Products Generated</h3>
+
 
 <p>{stats.productsGenerated}</p>
 
@@ -308,21 +347,27 @@ Dashboard
 
 <h3>This Month</h3>
 
+
 <p>{stats.thisMonth}</p>
+
 
 </div>
 
 <div className="dashboard-card">
 
+
 <h3>Words Generated</h3>
 
+
 <p>{stats.wordsGenerated}</p>
+
 
 </div>
 
 </div>
 
 <div className="preview-box">
+
 
 <div className="preview-header">
 
@@ -332,6 +377,7 @@ Dashboard
 Product Preview
 
 </h2>
+
 
 <input
 
@@ -351,27 +397,39 @@ setSearchTerm(e.target.value)
 
 />
 
+
+
 </div>
 
 <div className="table-container">
 
+
 <table>
+
 
 <thead>
 
+
 <tr>
+
 
 <th>Product</th>
 
+
 <th>Category</th>
+
 
 <th>Tone</th>
 
+
 <th>Action</th>
+
 
 </tr>
 
+
 </thead>
+
 
 <tbody>
 
@@ -379,7 +437,9 @@ setSearchTerm(e.target.value)
 
 filteredProducts.length>0 ?
 
+
 filteredProducts.map((product,index)=>(
+
 
 
 <tr key={product._id || index}>
@@ -393,7 +453,10 @@ filteredProducts.map((product,index)=>(
 
 <td>{product.tone}</td>
 
+
+
 <td>
+
 
 
 <Button
@@ -406,7 +469,11 @@ Edit
 
 </Button>
 
+
+
 <span> | </span>
+
+
 
 <Button
 
@@ -417,13 +484,20 @@ onClick={()=>confirmDelete(product._id)}
 Delete
 
 </Button>
+
+
+
 </td>
+
 
 </tr>
 
+
 ))
 
+
 :
+
 
 <tr>
 
@@ -435,21 +509,32 @@ No products found.
 
 Create your first AI description.
 
+
 </td>
+
 
 </tr>
 
+
 }
+
 
 </tbody>
 
+
 </table>
 
-</div>
 
 </div>
 
+
+
 </div>
+
+
+
+</div>
+
 
 </main>
 
@@ -471,11 +556,14 @@ title="Delete Product"
 
 >
 
+
 <p>
 
 Are you sure you want to delete this product?
 
 </p>
+
+
 
 <Button
 
@@ -487,14 +575,26 @@ Confirm Delete
 
 </Button>
 
+
+
 </Modal>
+
+
+
+
 
 <Footer/>
 
+
+
 </div>
+
 
 );
 
+
+
 }
+
 
 export default Dashboard;

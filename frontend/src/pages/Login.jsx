@@ -10,10 +10,15 @@ import { Input, Button } from "../components/ui";
 import { AuthContext } from "../context/AuthContext";
 
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
+
 function Login({ darkMode, setDarkMode }) {
 
 
   const [loginMode, setLoginMode] = useState(true);
+
 
 
   const [email,setEmail] = useState("");
@@ -21,70 +26,72 @@ function Login({ darkMode, setDarkMode }) {
   const [password,setPassword] = useState("");
 
 
+
   const [message,setMessage] = useState("");
 
 
+
   const { login } = useContext(AuthContext);
+
 
 
   const navigate = useNavigate();
 
   const submitHandler = async(e)=>{
 
-
     e.preventDefault();
-
 
     try{
 
-
       if(loginMode){
-
 
         const res = await axios.post(
 
-          "http://localhost:5000/api/auth/login",
+
+          `${API_URL}/api/auth/login`,
 
           {
-            email,
-            password
-          }
 
+            email,
+
+            password
+
+          }
         );
 
         setMessage("Login Successful");
 
-
         login(res.data.token);
-
         setTimeout(()=>{
 
           navigate("/dashboard");
 
         },1000);
 
-
-
       }
 
       else{
 
-
         const res = await axios.post(
 
-          "http://localhost:5000/api/auth/register",
+
+          `${API_URL}/api/auth/register`,
 
           {
+
             email,
+
             password
+
           }
 
         );
 
         setMessage(
-          res.data.message
-        );
 
+          res.data.message
+
+        );
 
         setTimeout(()=>{
 
@@ -96,20 +103,18 @@ function Login({ darkMode, setDarkMode }) {
 
       }
 
-
     }
 
     catch(error){
 
-
       setMessage(
+
 
         error.response?.data?.message ||
 
+
         "Something went wrong"
-
       );
-
 
     }
 
@@ -117,10 +122,11 @@ function Login({ darkMode, setDarkMode }) {
 
   const googleLogin = ()=>{
 
-
     window.location.href =
 
-    "http://localhost:5000/api/auth/google";
+
+    `${API_URL}/api/auth/google`;
+
 
 
   };
@@ -139,18 +145,18 @@ setDarkMode={setDarkMode}
 
 <main className="main-content">
 
-
 <div className="login-container">
-
 
 <div className="login-box">
 
-
 <h1>
+
 
 {
 
+
 loginMode ?
+
 
 "Login"
 
@@ -164,47 +170,60 @@ loginMode ?
 
 <form onSubmit={submitHandler}>
 
+
+
 <Input
+
 
 label="Email"
 
+
 type="email"
+
 
 placeholder="Enter Email"
 
+
 value={email}
+
 
 onChange={(e)=>setEmail(e.target.value)}
 
-/>
 
+/>
 <Input
+
 
 label="Password"
 
+
 type="password"
+
 
 placeholder="Enter Password"
 
+
 value={password}
+
 
 onChange={(e)=>setPassword(e.target.value)}
 
+
 />
-
 <Button type="submit">
-
 
 {
 
 loginMode ?
 
+
 "Login"
+
 
 :
 
-"Register"
 
+"Register"
 }
 
 </Button>
@@ -212,6 +231,7 @@ loginMode ?
 </form>
 
 <button
+
 
 className="google-btn"
 
@@ -224,16 +244,16 @@ Sign in with Google
 </button>
 
 {
-message &&
 
+message &&
 <p
+
 
 style={{
 
 marginTop:"15px",
 
 fontWeight:"600"
-
 }}
 
 >
@@ -246,19 +266,30 @@ fontWeight:"600"
 
 <p
 
+
 style={{
+
 
 cursor:"pointer",
 
+
 marginTop:"15px"
+
+
 
 }}
 
+
 onClick={()=>{
+
+
 
 setLoginMode(!loginMode);
 
+
 setMessage("");
+
+
 
 }}
 
@@ -268,11 +299,15 @@ setMessage("");
 
 loginMode
 
+
 ?
+
 
 "Don't have an account? Register"
 
+
 :
+
 
 "Already have an account? Login"
 

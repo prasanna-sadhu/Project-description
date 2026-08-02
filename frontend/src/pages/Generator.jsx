@@ -13,6 +13,9 @@ Toast
 } from "../components/ui";
 
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 function Generator({darkMode,setDarkMode}){
 
 
@@ -64,7 +67,7 @@ const token=sessionStorage.getItem("token");
 
 const res=await axios.get(
 
-`http://localhost:5000/api/products/${id}`,
+`${API_URL}/api/products/${id}`,
 
 {
 
@@ -136,6 +139,7 @@ setShowToast(false);
 
 
 
+
 const generateDescription=async(e)=>{
 
 
@@ -163,13 +167,14 @@ return;
 
 
 
+
 if(id){
 
 
 
 await axios.put(
 
-`http://localhost:5000/api/products/${id}`,
+`${API_URL}/api/products/${id}`,
 
 {
 
@@ -215,7 +220,7 @@ else{
 
 const res=await axios.post(
 
-"http://localhost:5000/api/ai/generate-description",
+`${API_URL}/api/ai/generate-description`,
 
 {
 
@@ -258,6 +263,7 @@ showMessage(
 );
 
 
+
 }
 
 
@@ -285,6 +291,7 @@ error.response?.data
 );
 
 
+
 showMessage(
 
 error.response?.data?.message ||
@@ -292,6 +299,7 @@ error.response?.data?.message ||
 "Operation Failed"
 
 );
+
 
 
 }
@@ -313,6 +321,7 @@ setLoading(false);
 
 
 
+
 return(
 
 <>
@@ -325,6 +334,7 @@ darkMode={darkMode}
 setDarkMode={setDarkMode}
 
 />
+
 
 
 
@@ -346,6 +356,7 @@ AI Product Description Generator
 
 
 
+
 <form onSubmit={generateDescription}>
 
 
@@ -361,6 +372,7 @@ onChange={(e)=>setProductName(e.target.value)}
 
 
 
+
 <Input
 
 label="Category"
@@ -370,6 +382,7 @@ value={category}
 onChange={(e)=>setCategory(e.target.value)}
 
 />
+
 
 
 
@@ -385,6 +398,7 @@ onChange={(e)=>setKeywords(e.target.value)}
 
 
 
+
 <Input
 
 label="Tone"
@@ -397,7 +411,9 @@ onChange={(e)=>setTone(e.target.value)}
 
 
 
+
 <Button type="submit">
+
 
 {
 
@@ -425,6 +441,8 @@ id ?
 
 
 
+
+
 <div className="generator-output">
 
 
@@ -436,11 +454,16 @@ Generated Description
 
 
 
+
+
 {
 
 loading && <Loader/>
 
 }
+
+
+
 
 
 
@@ -466,6 +489,9 @@ loading && <Loader/>
 
 
 
+
+
+
 {
 
 !loading && !description &&
@@ -484,21 +510,19 @@ Your AI-generated description will appear here...
 
 
 
+
+
+
+
 {
 
 showToast &&
 
-(
-
-Toast
-
-&&
-
 <Toast message={toastMessage}/>
 
-)
-
 }
+
+
 
 
 
@@ -511,6 +535,7 @@ Toast
 
 
 </main>
+
 
 
 
