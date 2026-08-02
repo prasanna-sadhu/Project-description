@@ -9,7 +9,7 @@ export function AuthProvider({children}){
 
 const [token,setToken]=useState(
 
-localStorage.getItem("token")
+sessionStorage.getItem("token")
 
 );
 
@@ -18,7 +18,7 @@ localStorage.getItem("token")
 const login=(newToken)=>{
 
 
-localStorage.setItem(
+sessionStorage.setItem(
 
 "token",
 
@@ -37,7 +37,7 @@ setToken(newToken);
 const logout=()=>{
 
 
-localStorage.removeItem(
+sessionStorage.removeItem(
 
 "token"
 

@@ -59,7 +59,7 @@ const fetchProduct=async()=>{
 try{
 
 
-const token=localStorage.getItem("token");
+const token=sessionStorage.getItem("token");
 
 
 const res=await axios.get(
@@ -148,7 +148,7 @@ try{
 setLoading(true);
 
 
-const token=localStorage.getItem("token");
+const token=sessionStorage.getItem("token");
 
 
 

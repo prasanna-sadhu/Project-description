@@ -74,7 +74,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     try{
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if(!token){
 
@@ -173,7 +173,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     try{
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       await axios.delete(
 
