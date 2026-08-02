@@ -13,7 +13,8 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",
+    "project-description-ten.vercel.app"],
     credentials: true
   })
 );
